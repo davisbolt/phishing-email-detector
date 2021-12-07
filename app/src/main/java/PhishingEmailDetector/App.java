@@ -4,11 +4,13 @@
 package PhishingEmailDetector;
 
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+    private static String[] emails;
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        if (args.length > 0) {
+            new EmailParser(args[0]);
+        } else {
+            new EmailParser("/home/davis/IdeaProjects/phishing-email-detector/emails/phishing/");
+        }
     }
 }
