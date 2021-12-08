@@ -4,13 +4,13 @@
 package PhishingEmailDetector;
 
 public class App {
-    private static String[] emails;
-
     public static void main(String[] args) {
+        EmailParser emailParser;
         if (args.length > 0) {
-            new EmailParser(args[0]);
+            emailParser = new EmailParser(args[0]);
         } else {
-            new EmailParser("/home/davis/IdeaProjects/phishing-email-detector/emails/phishing/");
+            emailParser = new EmailParser("/home/davis/IdeaProjects/phishing-email-detector/emails/phishing/");
         }
+        emailParser.testEmails();
     }
 }
