@@ -12,16 +12,17 @@ public class EmailLoader {
 
     public String[] loadEmails(String path) {
         String[] emails = null;
+
         try {
             if ((new File(path)).isDirectory()) {
                 File[] files = (new File(path)).listFiles();
                 emails = new String[files.length];
 
-                for (int i = 0; i < files.length - 1; i++) {
+                for (int i = 0; i < files.length; i++) {
                     FileInputStream fis = new FileInputStream(files[i]);
                     byte[] data = new byte[(int) files[i].length()];
                     fis.read(data);
-                    emails[i] = new String(data, StandardCharsets.UTF_8);
+                    emails[i] = (new String(data, StandardCharsets.UTF_8)).replaceAll("=\n", "");
                 }
             } else if ((new File(path).isFile())) {
                 File file = new File(path);
@@ -30,7 +31,7 @@ public class EmailLoader {
                 FileInputStream fis = new FileInputStream(file);
                 byte[] data = new byte[(int) file.length()];
                 fis.read(data);
-                emails[0] = new String(data, StandardCharsets.UTF_8);
+                emails[0] = (new String(data, StandardCharsets.UTF_8)).replaceAll("=\n", "");
             } else {
                 System.out.println("Not a valid file path or directory");
             }
