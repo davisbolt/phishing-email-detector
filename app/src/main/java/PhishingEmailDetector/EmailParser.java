@@ -57,6 +57,11 @@ public class EmailParser {
     }
 
     private boolean hasRedirectingLinks(String email){
+        ArrayList<String> linkTags = getLinkTags(email);
+        for (String linkTag : linkTags){
+            if (getHref(linkTag) != null && getHref(linkTag).contains("/do/redirect"))
+                return true;
+        }
 
         return false;
     }
