@@ -1,5 +1,7 @@
 package PhishingEmailDetector;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,11 +78,45 @@ public class EmailParser {
     }
 
     private boolean hasDomainNameMismatch(String email){
+        ArrayList<String> linkTags = getLinkTags(email);
+        String fromAddress = getFromAddress(email);
+        String addressDomain = null;
+        String linkDomain = null;
+
+        if (EmailValidator.getInstance().isValid(fromAddress)) {
+            try {
+                URI addressURI = new URI(fromAddress);
+                addressDomain = addressURI.getHost();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (String linkTag : linkTags){
+            String href = getHref(linkTag);
+            UrlValidator urlValidator = new UrlValidator();
+            if (urlValidator.isValid(href)) {
+                try {
+                    URI linkUri = new URI(href);
+                    linkDomain = linkUri.getHost().replaceFirst("www.", "");
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (addressDomain != null && linkDomain != null && !addressDomain.equals(linkDomain))
+                return true;
+        }
 
         return false;
     }
 
     private boolean hasReturnAddressMismatch(String email){
+        String fromAddress = getFromAddress(email);
+        String returnAddress = getReturnAddress(email);
+
+        if (fromAddress != null && returnAddress != null && !fromAddress.equals(returnAddress))
+            return true;
 
         return false;
     }
@@ -107,12 +143,43 @@ public class EmailParser {
     }
 
     private String getHref(String linkTag){
-        Pattern hrefPattern = Pattern.compile("href=[^\"]*\"[^\"<>]*\"", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+        Pattern hrefPattern = Pattern.compile("href=[^\"]*\"[^\"<>]*\"", Pattern.CASE_INSENSITIVE);
         Matcher hrefMatcher = hrefPattern.matcher(linkTag);
         if (hrefMatcher.find()) {
             String href = hrefMatcher.group();
-            return href.substring(href.indexOf('\"') + 1, href.length() - 1).replaceAll("[ \t\n\\x0B\f\r]", "");
+            String hrefClean = href.substring(href.indexOf('\"') + 1, href.length() - 1).replaceAll("[ \t\n\\x0B\f\r]", "");
+            UrlValidator validator = new UrlValidator();
+            //if (validator.isValid(hrefClean))
+                return hrefClean;
         }
+        return null;
+    }
+
+    private String getFromAddress(String email){
+        Pattern addressPattern = Pattern.compile("From:[^<\n]*<[^>\n]*>", Pattern.CASE_INSENSITIVE);
+        Matcher addressMatcher = addressPattern.matcher(email);
+        if (addressMatcher.find()){
+            String address = addressMatcher.group();
+            String addressClean = address.substring(address.indexOf('<') + 1, address.length() - 1).replaceAll("[ \"]", "");
+            if (EmailValidator.getInstance().isValid(addressClean))
+                return addressClean;
+        }
+
+        return null;
+    }
+
+    private String getReturnAddress(String email){
+        Pattern addressPattern = Pattern.compile("Return-Path:[^\n]*", Pattern.CASE_INSENSITIVE);
+        Matcher addressMatcher = addressPattern.matcher(email);
+        if (addressMatcher.find()){
+            String address = addressMatcher.group();
+            String addressClean = address.replaceAll("Return-Path:[<>\" ]*", "");
+            if (EmailValidator.getInstance().isValid(addressClean)){
+                System.out.println(addressClean);
+                return addressClean;
+            }
+        }
+
         return null;
     }
 }
