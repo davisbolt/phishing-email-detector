@@ -26,10 +26,14 @@ public class EmailParser {
         int numTestsPassed = 0;
 
         if (hasMisleadingLinks(email)) numTestsPassed++;
-        if (hasDomainNameMismatch(email)) numTestsPassed++;
         if (hasRedirectingLinks(email)) numTestsPassed++;
+        if (hasUnsafeLinks(email)) numTestsPassed++;
+
+        if (hasDomainNameMismatch(email)) numTestsPassed++;
         if (hasReturnAddressMismatch(email)) numTestsPassed++;
+
         if (hasSuspiciousAttachment(email)) numTestsPassed++;
+
         if (hasSpellingErrors(email)) numTestsPassed++;
 
         return numTestsPassed;
@@ -51,11 +55,6 @@ public class EmailParser {
         return false;
     }
 
-    private boolean hasDomainNameMismatch(String email){
-
-        return false;
-    }
-
     private boolean hasRedirectingLinks(String email){
         ArrayList<String> linkTags = getLinkTags(email);
         for (String linkTag : linkTags){
@@ -65,6 +64,22 @@ public class EmailParser {
 
         return false;
     }
+
+    private boolean hasUnsafeLinks(String email){
+        ArrayList<String> linkTags = getLinkTags(email);
+        for (String linkTag : linkTags){
+            if (getHref(linkTag) != null && getHref(linkTag).contains("http:"))
+                return true;
+        }
+
+        return false;
+    }
+
+    private boolean hasDomainNameMismatch(String email){
+
+        return false;
+    }
+
     private boolean hasReturnAddressMismatch(String email){
 
         return false;
