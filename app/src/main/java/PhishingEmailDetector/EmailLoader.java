@@ -22,7 +22,7 @@ public class EmailLoader {
                     FileInputStream fis = new FileInputStream(files[i]);
                     byte[] data = new byte[(int) files[i].length()];
                     fis.read(data);
-                    emails[i] = (new String(data, StandardCharsets.UTF_8)).replaceAll("=\n", "");
+                    emails[i] = (new String(data, StandardCharsets.UTF_8)).replaceAll("(=\n)|(!\n)", "");
                 }
             } else if ((new File(path).isFile())) {
                 File file = new File(path);
