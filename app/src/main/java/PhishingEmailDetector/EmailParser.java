@@ -37,7 +37,7 @@ public class EmailParser {
         if (hasDomainNameMismatch(email)) numTestsPassed++;
         if (hasReturnAddressMismatch(email)) numTestsPassed++;
 
-        //if (hasSuspiciousAttachment(email)) numTestsPassed++;
+        if (hasSuspiciousAttachment(email)) numTestsPassed++;
 
         //if (hasSpellingErrors(email)) numTestsPassed++;
 
@@ -116,6 +116,15 @@ public class EmailParser {
     }
 
     private boolean hasSuspiciousAttachment(String email){
+        Pattern attachmentPattern = Pattern.compile("Content-Disposition: attachment; filename=[^\n]*");
+        Matcher attachmentMatcher = attachmentPattern.matcher(email);
+        if (attachmentMatcher.find()){
+            String attachment = attachmentMatcher.group();
+            String attachmentClean = attachment.replaceAll("Content-Disposition: attachment; filename=|[\n\" ]", "");
+            Pattern extensionPattern = Pattern.compile("(.exe|.zip|.htm|.html)$", Pattern.CASE_INSENSITIVE);
+            if (extensionPattern.matcher(attachmentClean).find())
+                return true;
+        }
 
         return false;
     }
