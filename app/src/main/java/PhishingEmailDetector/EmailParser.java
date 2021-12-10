@@ -17,14 +17,23 @@ public class EmailParser {
     public void testEmails(){
         if (emails == null ) return;
 
-        for (String email : emails) {
-            int score = getTestScores(email);
+        if(emails.length == 1){
+            int score = getTestScores(emails[0]);
             if (score > 0){
                 System.out.println("Likely Phishing");
                 System.out.println("Score: " + score);
             } else {
                 System.out.println("Likely Not Phishing");
             }
+        } else {
+            int sum = 0;
+            for (String email : emails) {
+                int score = getTestScores(email);
+                if (score > 0){
+                    sum++;
+                }
+            }
+            System.out.println("Score sum: " + sum);
         }
     }
 
