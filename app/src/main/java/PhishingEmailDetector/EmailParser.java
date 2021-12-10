@@ -33,7 +33,7 @@ public class EmailParser {
                     sum++;
                 }
             }
-            System.out.println("Score sum: " + sum);
+            System.out.println("Likely Phishing: " + sum);
         }
     }
 
