@@ -1,5 +1,5 @@
 # phishing-email-detector
-An application for detecting phishing emails.
+An application for detecting phishing emails. This is part of my project for my Cybersecurity and Resiliance class.
 
 ## Build
 Requires Gradle.
