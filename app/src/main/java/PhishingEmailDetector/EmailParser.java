@@ -9,7 +9,6 @@ import org.apache.commons.validator.routines.*;
 
 public class EmailParser {
     private String[] emails;
-    private int sum = 0;
 
     public EmailParser(String path){
         emails = EmailLoader.getInstance().loadEmails(path);
@@ -19,12 +18,14 @@ public class EmailParser {
         if (emails == null ) return;
 
         for (String email : emails) {
-            //sum += getTestScores(email);
-            if (getTestScores(email) >= 1){
-                sum++;
+            int score = getTestScores(email);
+            if (score > 0){
+                System.out.println("Likely Phishing");
+                System.out.println("Score: " + score);
+            } else {
+                System.out.println("Likely Not Phishing");
             }
         }
-        System.out.println(sum);
     }
 
     private int getTestScores(String email){
@@ -35,7 +36,7 @@ public class EmailParser {
         if (hasUnsafeLinks(email)) numTestsPassed++;
 
         if (hasDomainNameMismatch(email)) numTestsPassed++;
-        if (hasReturnAddressMismatch(email)) numTestsPassed++;
+        //if (hasReturnAddressMismatch(email)) numTestsPassed++;
 
         if (hasSuspiciousAttachment(email)) numTestsPassed++;
 

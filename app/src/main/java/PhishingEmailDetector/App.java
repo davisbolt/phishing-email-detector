@@ -8,11 +8,10 @@ public class App {
         EmailParser emailParser;
         if (args.length > 0) {
             emailParser = new EmailParser(args[0]);
+            emailParser.testEmails();
         } else {
-            emailParser = new EmailParser("/home/davis/IdeaProjects/phishing-email-detector/emails/phishing/");
-            //emailParser = new EmailParser("/home/davis/IdeaProjects/phishing-email-detector/emails/benign/");
-            //emailParser = new EmailParser("/home/davis/IdeaProjects/phishing-email-detector/emails/mine_phishing/");
+            System.out.println("Usage: gradle run --args=\"<email file path>\"");
         }
-        emailParser.testEmails();
+
     }
 }
