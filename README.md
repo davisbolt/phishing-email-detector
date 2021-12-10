@@ -1,8 +1,8 @@
 # phishing-email-detector
-A most likely terrible detector for phishing emails.
+An application for detecting phishing emails.
 
 ## Build
-Requires Gradle
+Requires Gradle.
 
 `gradle build`
 
