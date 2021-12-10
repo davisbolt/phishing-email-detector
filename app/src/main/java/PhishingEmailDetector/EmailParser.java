@@ -26,14 +26,19 @@ public class EmailParser {
                 System.out.println("Likely Not Phishing");
             }
         } else {
-            int sum = 0;
+            int sum1 = 0, sum2 = 0, sum3 = 0;
             for (String email : emails) {
                 int score = getTestScores(email);
-                if (score > 0){
-                    sum++;
-                }
+                if (score > 0)
+                    sum1++;
+                if (score > 1)
+                    sum2++;
+                if (score > 2)
+                    sum3++;
             }
-            System.out.println("Likely Phishing: " + sum);
+            System.out.println("Score > 0: " + sum1);
+            System.out.println("Score > 1: " + sum2);
+            System.out.println("Score > 2: " + sum3);
         }
     }
 
