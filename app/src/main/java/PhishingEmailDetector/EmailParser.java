@@ -9,7 +9,7 @@ import org.apache.commons.validator.routines.*;
 
 public class EmailParser {
     private String[] emails;
-    private int sum;
+    private int sum = 0;
 
     public EmailParser(String path){
         emails = EmailLoader.getInstance().loadEmails(path);
@@ -19,7 +19,10 @@ public class EmailParser {
         if (emails == null ) return;
 
         for (String email : emails) {
-            sum += getTestScores(email);
+            //sum += getTestScores(email);
+            if (getTestScores(email) >= 1){
+                sum++;
+            }
         }
         System.out.println(sum);
     }
@@ -34,9 +37,9 @@ public class EmailParser {
         if (hasDomainNameMismatch(email)) numTestsPassed++;
         if (hasReturnAddressMismatch(email)) numTestsPassed++;
 
-        if (hasSuspiciousAttachment(email)) numTestsPassed++;
+        //if (hasSuspiciousAttachment(email)) numTestsPassed++;
 
-        if (hasSpellingErrors(email)) numTestsPassed++;
+        //if (hasSpellingErrors(email)) numTestsPassed++;
 
         return numTestsPassed;
     }
@@ -49,7 +52,7 @@ public class EmailParser {
             while (displayedLinkMatcher.find()){
                 String displayedLink = displayedLinkMatcher.group().replaceAll("[ \t\n\\x0B\f\r<>]", "");
                 UrlValidator validator = new UrlValidator();
-                if (validator.isValid(displayedLink) && !displayedLink.equals(getHref(linkTag)))
+                if (validator.isValid(displayedLink) && !displayedLink.equalsIgnoreCase(getHref(linkTag)))
                     return true;
             }
         }
@@ -83,14 +86,8 @@ public class EmailParser {
         String addressDomain = null;
         String linkDomain = null;
 
-        if (EmailValidator.getInstance().isValid(fromAddress)) {
-            try {
-                URI addressURI = new URI(fromAddress);
-                addressDomain = addressURI.getHost();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
+        if(fromAddress != null)
+            addressDomain = fromAddress.substring(fromAddress.indexOf('@') + 1);
 
         for (String linkTag : linkTags){
             String href = getHref(linkTag);
@@ -104,7 +101,7 @@ public class EmailParser {
                 }
             }
 
-            if (addressDomain != null && linkDomain != null && !addressDomain.equals(linkDomain))
+            if (addressDomain != null && linkDomain != null && !linkDomain.contains(addressDomain))
                 return true;
         }
 
@@ -115,10 +112,7 @@ public class EmailParser {
         String fromAddress = getFromAddress(email);
         String returnAddress = getReturnAddress(email);
 
-        if (fromAddress != null && returnAddress != null && !fromAddress.equals(returnAddress))
-            return true;
-
-        return false;
+        return fromAddress != null && returnAddress != null && !fromAddress.equals(returnAddress);
     }
 
     private boolean hasSuspiciousAttachment(String email){
@@ -130,6 +124,7 @@ public class EmailParser {
 
         return false;
     }
+
 
 
     private ArrayList<String> getLinkTags(String email){
@@ -147,10 +142,7 @@ public class EmailParser {
         Matcher hrefMatcher = hrefPattern.matcher(linkTag);
         if (hrefMatcher.find()) {
             String href = hrefMatcher.group();
-            String hrefClean = href.substring(href.indexOf('\"') + 1, href.length() - 1).replaceAll("[ \t\n\\x0B\f\r]", "");
-            UrlValidator validator = new UrlValidator();
-            //if (validator.isValid(hrefClean))
-                return hrefClean;
+            return href.substring(href.indexOf('\"') + 1, href.length() - 1).replaceAll("[ \t\n\\x0B\f\r]", "").toLowerCase();
         }
         return null;
     }
@@ -160,7 +152,7 @@ public class EmailParser {
         Matcher addressMatcher = addressPattern.matcher(email);
         if (addressMatcher.find()){
             String address = addressMatcher.group();
-            String addressClean = address.substring(address.indexOf('<') + 1, address.length() - 1).replaceAll("[ \"]", "");
+            String addressClean = address.substring(address.indexOf('<') + 1, address.length() - 1).replaceAll("[ \"]", "").toLowerCase();
             if (EmailValidator.getInstance().isValid(addressClean))
                 return addressClean;
         }
@@ -173,11 +165,9 @@ public class EmailParser {
         Matcher addressMatcher = addressPattern.matcher(email);
         if (addressMatcher.find()){
             String address = addressMatcher.group();
-            String addressClean = address.replaceAll("Return-Path:[<>\" ]*", "");
-            if (EmailValidator.getInstance().isValid(addressClean)){
-                System.out.println(addressClean);
+            String addressClean = address.replaceAll("(Return-Path:|[><\" ])", "").toLowerCase();
+            if (EmailValidator.getInstance().isValid(addressClean))
                 return addressClean;
-            }
         }
 
         return null;

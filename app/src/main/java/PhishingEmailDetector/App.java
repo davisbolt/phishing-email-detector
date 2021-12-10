@@ -10,6 +10,8 @@ public class App {
             emailParser = new EmailParser(args[0]);
         } else {
             emailParser = new EmailParser("/home/davis/IdeaProjects/phishing-email-detector/emails/phishing/");
+            //emailParser = new EmailParser("/home/davis/IdeaProjects/phishing-email-detector/emails/benign/");
+            //emailParser = new EmailParser("/home/davis/IdeaProjects/phishing-email-detector/emails/mine_phishing/");
         }
         emailParser.testEmails();
     }
